@@ -1,0 +1,10 @@
+# 本机 SDK 路径，勿上传
+local.properties
+
+# Gradle / Android Studio
+.gradle/
+build/
+*/build/
+.idea/
+*.iml
+.DS_Store
