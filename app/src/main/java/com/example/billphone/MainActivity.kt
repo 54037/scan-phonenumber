@@ -58,21 +58,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startCamera() {
-        val future = ProcessCameraProvider.getInstance(this)
-        future.addListener({
-            val provider = future.get()
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        cameraProviderFuture.addListener({
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
-            val preview = Preview.Builder().build().also {
-                it.surfaceProvider = binding.previewView.surfaceProvider
-            }
+            val preview = Preview.Builder().build()
+            preview.setSurfaceProvider(binding.previewView.surfaceProvider)
 
             // 720p 分析流：面单字体大，720p 足够，速度明显快于 1080p
-            val analysis = ImageAnalysis.Builder()
+            val imageAnalysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setTargetResolution(Size(1280, 720))
                 .build()
 
-            analysis.setAnalyzer(cameraExecutor) { proxy ->
+            imageAnalysis.setAnalyzer(cameraExecutor) { proxy ->
                 if (locked) {
                     proxy.close()
                     return@setAnalyzer
@@ -96,9 +95,9 @@ class MainActivity : AppCompatActivity() {
                     .addOnCompleteListener { proxy.close() }
             }
 
-            provider.unbindAll()
-            provider.bindToLifecycle(
-                this, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis
+            cameraProvider.unbindAll()
+            cameraProvider.bindToLifecycle(
+                this, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageAnalysis
             )
         }, ContextCompat.getMainExecutor(this))
     }
